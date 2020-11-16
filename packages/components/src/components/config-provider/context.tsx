@@ -26,14 +26,25 @@ export interface ConfigConsumerProps {
   dropdownMatchSelectWidth?: boolean;
 }
 
-export const ConfigContext = React.createContext<ConfigConsumerProps>({
-  // We provide a default function for Context without provider
+let rootPrefixCls = 'gio';
+const defaultConfig = {
   getPrefixCls: (suffixCls?: string, customizePrefixCls?: string) => {
-    if (customizePrefixCls) return customizePrefixCls;
+    const { customizePrefixCls: prefixCls = rootPrefixCls } = { customizePrefixCls };
 
-    return suffixCls ? `gio-${suffixCls}` : 'gio';
+    return [prefixCls, suffixCls].filter((s) => !!s).join('-');
+  },
+};
+
+const definedConfig = Object.defineProperty(defaultConfig, 'rootPrefixCls', {
+  set(nextValue) {
+    rootPrefixCls = nextValue;
+  },
+  get() {
+    return rootPrefixCls;
   },
 });
+
+export const ConfigContext = React.createContext<ConfigConsumerProps>(definedConfig);
 
 export const ConfigConsumer = ConfigContext.Consumer;
 
